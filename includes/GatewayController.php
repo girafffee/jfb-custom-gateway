@@ -6,6 +6,7 @@ namespace Jet_FB_Custom_Gateway;
 
 use Jet_FB_Custom_Gateway\Logic\PayNow;
 use Jet_Form_Builder\Gateways\Base_Scenario_Gateway;
+use Jet_Form_Builder\Classes\Tools as JFBTools;
 
 class GatewayController extends Base_Scenario_Gateway {
 
@@ -44,6 +45,25 @@ class GatewayController extends Base_Scenario_Gateway {
 				'label'   => _x( 'Gateway Action', 'jfb-custom-gateway' ),
 				'default' => PayNow::scenario_id(),
 			),
+		);
+	}
+
+	public function custom_labels(): array {
+		return array(
+			'scenario' => ScenariosManager::instance()->view()->get_editor_labels(),
+		);
+	}
+
+	public function additional_editor_data(): array {
+		return array_merge(
+			array(
+				'version'   => 1,
+				'scenarios' => JFBTools::with_placeholder(
+					ScenariosManager::instance()->view()->get_items_list(),
+					__( 'Choose scenario...', 'jet-form-builder' )
+				),
+			),
+			ScenariosManager::instance()->view()->get_editor_data()
 		);
 	}
 }

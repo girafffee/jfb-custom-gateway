@@ -10,6 +10,7 @@ class Repository extends Scenarios_View_Repository {
 
 	public function rep_instances(): array {
 		return array(
+			new PayNow(),
 		);
 	}
 }

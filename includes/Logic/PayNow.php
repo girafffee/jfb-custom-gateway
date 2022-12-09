@@ -5,12 +5,16 @@ namespace Jet_FB_Custom_Gateway\Logic;
 
 
 use Jet_FB_Custom_Gateway\Connectors\PayNowConnector;
-use Jet_Form_Builder\Exceptions\Gateway_Exception;
+use Jet_Form_Builder\Actions\Types\Save_Record;
+use Jet_Form_Builder\Db_Queries\Exceptions\Sql_Exception;
+use Jet_Form_Builder\Gateways\Db_Models\Payment_To_Record;
 use Jet_Form_Builder\Gateways\Scenarios_Abstract\Scenario_Logic_Base;
 
 class PayNow extends Scenario_Logic_Base {
 
 	use PayNowConnector;
+
+	private $resource_id;
 
 	/**
 	 * Runs after all actions are completed.
@@ -24,18 +28,39 @@ class PayNow extends Scenario_Logic_Base {
 		 * 2. Save the payment in a special table. An example is here
 		 * @see \Jet_Form_Builder\Gateways\Paypal\Scenarios_Logic\Pay_Now::save_resource
 		 *
-		 * 3. Save the ID of the newly created record using
-		 * @see \Jet_Form_Builder\Gateways\Scenarios_Abstract\Scenario_Logic_Base::add_context
+		 * 3. Save the ID of the newly created record to the
+		 * @see \Jet_FB_Custom_Gateway\Logic\PayNow::$resource_id
 		 *
 		 * 4. It is necessary to save the redirect address in the response_data field
 		 * of the Action_Handler object under the key 'redirect'
 		 *
 		 * @example jet_fb_action_handler()->add_response( array( 'redirect' => $href ) );
-		 *
-		 * 5. Finally, we have to connect the Form Record with
-		 * the payment through an intermediate table
-		 * @see \Jet_Form_Builder\Gateways\Paypal\Scenarios_Logic\Pay_Now::attach_record_id
 		 */
+
+		Save_Record::add_hidden();
+
+		add_action(
+			'jet-form-builder/form-handler/after-send',
+			array( $this, 'attach_record_id' )
+		);
+	}
+
+	/**
+	 * @throws Sql_Exception
+	 */
+	public function attach_record_id() {
+		$record_id = jet_fb_action_handler()->get_context( Save_Record::ID, 'id' );
+
+		if ( ! $record_id || ! $this->resource_id ) {
+			return;
+		}
+
+		( new Payment_To_Record() )->insert(
+			array(
+				'record_id'  => $record_id,
+				'payment_id' => $this->resource_id,
+			)
+		);
 	}
 
 	/**
@@ -51,9 +76,9 @@ class PayNow extends Scenario_Logic_Base {
 	 * This method should return a unique string that is used to look
 	 * up the payment in the database and then use it more often for the request API.
 	 *
+	 * @return string
 	 * @see \Jet_Form_Builder\Gateways\Paypal\Scenarios_Logic\Pay_Now::query_token
 	 *
-	 * @return string
 	 */
 	protected function query_token() {
 		return '';

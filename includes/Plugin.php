@@ -4,6 +4,8 @@
 namespace Jet_FB_Custom_Gateway;
 
 
+use Jet_FB_Custom_Gateway\RestApi\Controller;
+
 class Plugin {
 	/**
 	 * Instance.
@@ -16,11 +18,18 @@ class Plugin {
 	 *
 	 * @var Plugin
 	 */
-	public static $instance = null;
+	private static $instance = null;
 
 	public $slug = 'jet-form-builder-custom-gateway';
 
 	private function __construct() {
+		if ( ! Tools::has_jfb() ) {
+			return;
+		}
+		GatewayManager::register();
+		EditorManager::register();
+
+		( new Controller() )->rest_api_init();
 	}
 
 	public function get_version(): string {
