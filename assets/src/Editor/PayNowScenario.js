@@ -4,7 +4,9 @@ const {
 	      withSelect,
 	      withDispatch,
       } = wp.data;
-
+const {
+	      __,
+      } = wp.i18n;
 const {
 	      TextControl,
 	      SelectControl,
@@ -32,7 +34,6 @@ function PayNowScenario( {
 	scenarioSource,
 	noticeOperations,
 	scenarioLabel,
-	globalGatewayLabel,
 } ) {
 
 	const displayNotice = status => response => {
@@ -46,17 +47,25 @@ function PayNowScenario( {
 
 	return <>
 		<BaseControl
-			label={ scenarioLabel( 'fetch_button_label' ) }
+			label={ __( 'Request Button', 'jfb-custom-gateway' ) }
 		>
 			<div className="jet-user-fields-map__list">
-				{ ( ! loadingGateway.success && ! loadingGateway.loading ) && <span
+				{ (
+					!loadingGateway.success && !loadingGateway.loading
+				) && <span
 					className={ 'description-controls' }
 				>
-					{ scenarioLabel( 'fetch_button_help' ) }
+					{ __(
+						'Click on the button to further manage the payment settings',
+						'jfb-custom-gateway'
+					) }
 				</span> }
 				<GatewayFetchButton
-					initialLabel={ scenarioLabel( 'fetch_button' ) }
-					label={ scenarioLabel( 'fetch_button_retry' ) }
+					initialLabel={ __(
+						'Sync Access Token',
+						'jfb-custom-gateway',
+					) }
+					label={ __( 'Access Token updated', 'jfb-custom-gateway' ) }
 					apiArgs={ {
 						...scenarioSource.fetch,
 						data: {
@@ -70,15 +79,15 @@ function PayNowScenario( {
 		</BaseControl>
 		{ loadingGateway.success && <>
 			<TextControl
-				label={ scenarioLabel( 'currency' ) }
+				label={ __( 'Currency Code', 'jfb-custom-gateway' ) }
 				value={ gatewaySpecific.currency }
 				onChange={ currency => setGatewaySpecific( { currency } ) }
 			/>
 			<SelectControl
-				label={ globalGatewayLabel( 'price_field' ) }
+				label={ __( 'Price/amount field', 'jfb-custom-gateway' ) }
 				key={ 'form_fields_price_field' }
 				value={ gatewayGeneral.price_field }
-				labelPosition='side'
+				labelPosition="side"
 				onChange={ price_field => {
 					setGateway( { price_field } );
 				} }

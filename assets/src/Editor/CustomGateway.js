@@ -1,6 +1,11 @@
 const gatewayID = 'custom';
 
-const { compose } = wp.compose;
+const {
+	      compose,
+      } = wp.compose;
+const {
+	      __,
+      } = wp.i18n;
 
 const {
 	      withSelect,
@@ -27,7 +32,7 @@ const {
 	      withDispatchGateways,
       } = JetFBHooks;
 
-let StripeMain = function ( {
+let CustomGatewayMain = function ( {
 	setGatewayRequest,
 	gatewaySpecific,
 	setGatewaySpecific,
@@ -35,7 +40,6 @@ let StripeMain = function ( {
 	setGatewayScenario,
 	getSpecificOrGlobal,
 	additionalSourceGateway,
-	specificGatewayLabel,
 	noticeOperations,
 	noticeUI,
 } ) {
@@ -56,25 +60,25 @@ let StripeMain = function ( {
 		{ noticeUI }
 		<ToggleControl
 			key={ 'use_global' }
-			label={ specificGatewayLabel( 'use_global' ) }
+			label={ __( 'Use Global Settings', 'jfb-custom-gateway' ) }
 			checked={ gatewaySpecific.use_global }
 			onChange={ use_global => setGatewaySpecific( { use_global } ) }
 		/>
 		<TextControl
-			label={ specificGatewayLabel( 'public' ) }
+			label={ __( 'Public Key', 'jfb-custom-gateway' ) }
 			value={ getSpecificOrGlobal( 'public' ) }
 			onChange={ value => setGatewaySpecific( { public: value } ) }
 			disabled={ gatewaySpecific.use_global }
 		/>
 		<TextControl
-			label={ specificGatewayLabel( 'secret' ) }
+			label={ __( 'Secret Key', 'jfb-custom-gateway' ) }
 			value={ getSpecificOrGlobal( 'secret' ) }
 			onChange={ secret => setGatewaySpecific( { secret } ) }
 			disabled={ gatewaySpecific.use_global }
 		/>
 		<SelectControl
 			labelPosition="side"
-			label={ specificGatewayLabel( 'gateway_type' ) }
+			label={ __( 'Gateway Action', 'jfb-custom-gateway' ) }
 			value={ scenario }
 			onChange={ id => {
 				setGatewayScenario( { id } );
@@ -89,6 +93,6 @@ export default compose(
 	withSelect( withSelectGateways ),
 	withDispatch( withDispatchGateways ),
 	withNotices,
-)( StripeMain );
+)( CustomGatewayMain );
 
 export { gatewayID };
