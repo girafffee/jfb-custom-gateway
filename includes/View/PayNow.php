@@ -18,7 +18,10 @@ class PayNow extends Scenario_View_Base {
 
 	public function get_editor_data(): array {
 		return array(
-			'fetch' => FetchPayNowEditor::get_endpoint(),
+			'fetch' => array(
+				'url'    => FetchPayNowEditor::rest_url(),
+				'method' => FetchPayNowEditor::get_methods()
+			),
 		);
 	}
 
